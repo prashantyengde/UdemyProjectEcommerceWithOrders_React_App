@@ -2,7 +2,8 @@ import React, { useContext, useState, useEffect } from "react";
 import AppContext from "../Context/Context";
 import axios from "axios";
 import CheckoutPopup from "./CheckoutPopup";
-import { Button } from 'react-bootstrap';
+import { Button } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 const Cart = () => {
   const { cart, removeFromCart, clearCart } = useContext(AppContext);
@@ -35,7 +36,7 @@ const Cart = () => {
   useEffect(() => {
     const total = cartItems.reduce(
       (acc, item) => acc + item.price * item.quantity,
-      0
+      0,
     );
     setTotalPrice(total);
   }, [cartItems]);
@@ -63,7 +64,7 @@ const Cart = () => {
     const newCartItems = cartItems.map((item) =>
       item.id === itemId
         ? { ...item, quantity: Math.max(item.quantity - 1, 1) }
-        : item
+        : item,
     );
     setCartItems(newCartItems);
   };
@@ -73,37 +74,43 @@ const Cart = () => {
     const newCartItems = cartItems.filter((item) => item.id !== itemId);
     setCartItems(newCartItems);
   };
-  const convertBase64ToDataURL = (base64String, mimeType = 'image/jpeg') => {
-  // ✅ Fallback image if base64String is empty or undefined
-  const fallbackImage = "/fallback-image.jpg"; // make sure this image exists in your public folder
+  const convertBase64ToDataURL = (base64String, mimeType = "image/jpeg") => {
+    // ✅ Fallback image if base64String is empty or undefined
+    const fallbackImage = "/fallback-image.jpg"; // make sure this image exists in your public folder
 
-  if (!base64String) return fallbackImage;
+    if (!base64String) return fallbackImage;
 
-  if (base64String.startsWith("data:")) {
-    return base64String;
-  }
+    if (base64String.startsWith("data:")) {
+      return base64String;
+    }
 
-  if (base64String.startsWith("http")) {
-    return base64String;
-  }
+    if (base64String.startsWith("http")) {
+      return base64String;
+    }
 
-  return `data:${mimeType};base64,${base64String}`;
-};
+    return `data:${mimeType};base64,${base64String}`;
+  };
 
   const handleCheckout = async () => {
     try {
       for (const item of cartItems) {
-        const { imageUrl, imageName, imageData, imageType, quantity, ...rest } = item;
+        const { imageUrl, imageName, imageData, imageType, quantity, ...rest } =
+          item;
         const updatedStockQuantity = item.stockQuantity - item.quantity;
 
-        const updatedProductData = { ...rest, stockQuantity: updatedStockQuantity };
+        const updatedProductData = {
+          ...rest,
+          stockQuantity: updatedStockQuantity,
+        };
         console.log("updated product data", updatedProductData);
 
         const cartProduct = new FormData();
         cartProduct.append("imageFile", cartImage);
         cartProduct.append(
           "product",
-          new Blob([JSON.stringify(updatedProductData)], { type: "application/json" })
+          new Blob([JSON.stringify(updatedProductData)], {
+            type: "application/json",
+          }),
         );
 
         await axios
@@ -113,7 +120,7 @@ const Cart = () => {
             },
           })
           .then((response) => {
-            console.log("Product updated successfully:", (cartProduct));
+            console.log("Product updated successfully:", cartProduct);
           })
           .catch((error) => {
             console.error("Error updating product:", error);
@@ -140,7 +147,9 @@ const Cart = () => {
                 <div className="text-center py-5">
                   <i className="bi bi-cart-x fs-1 text-muted"></i>
                   <h5 className="mt-3">Your cart is empty</h5>
-                  <a href="/" className="btn btn-primary mt-3">Continue Shopping</a>
+                  <a href="/" className="btn btn-primary mt-3">
+                    Continue Shopping
+                  </a>
                 </div>
               ) : (
                 <>
@@ -170,17 +179,24 @@ const Cart = () => {
                                 />
                                 <div>
                                   <h6 className="mb-0">{item.name}</h6>
-                                  <small className="text-muted">{item.brand}</small>
+                                  <small className="text-muted">
+                                    {item.brand}
+                                  </small>
                                 </div>
                               </div>
                             </td>
                             <td>₹ {item.price}</td>
                             <td>
-                              <div className="input-group input-group-sm" style={{ width: "120px" }}>
+                              <div
+                                className="input-group input-group-sm"
+                                style={{ width: "120px" }}
+                              >
                                 <button
                                   className="btn btn-outline-secondary"
                                   type="button"
-                                  onClick={() => handleDecreaseQuantity(item.id)}
+                                  onClick={() =>
+                                    handleDecreaseQuantity(item.id)
+                                  }
                                 >
                                   <i className="bi bi-dash"></i>
                                 </button>
@@ -193,13 +209,17 @@ const Cart = () => {
                                 <button
                                   className="btn btn-outline-secondary"
                                   type="button"
-                                  onClick={() => handleIncreaseQuantity(item.id)}
+                                  onClick={() =>
+                                    handleIncreaseQuantity(item.id)
+                                  }
                                 >
                                   <i className="bi bi-plus"></i>
                                 </button>
                               </div>
                             </td>
-                            <td className="fw-bold">₹ {(item.price * item.quantity).toFixed(2)}</td>
+                            <td className="fw-bold">
+                              ₹ {(item.price * item.quantity).toFixed(2)}
+                            </td>
                             <td>
                               <button
                                 className="btn btn-sm btn-outline-danger"

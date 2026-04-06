@@ -1,18 +1,25 @@
-import axios from 'axios';
-import React, { useState } from 'react';
-import { Modal, Button, Form, Alert, Toast, ToastContainer } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-
+import axios from "axios";
+import React, { useState } from "react";
+import {
+  Modal,
+  Button,
+  Form,
+  Alert,
+  Toast,
+  ToastContainer,
+} from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import unplugged from "../assets/unplugged.png";
 const CheckoutPopup = ({ show, handleClose, cartItems, totalPrice }) => {
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const navigate = useNavigate();
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [validated, setValidated] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastVariant, setToastVariant] = useState('success');
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVariant, setToastVariant] = useState("success");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleConfirm = async (event) => {
@@ -28,50 +35,50 @@ const CheckoutPopup = ({ show, handleClose, cartItems, totalPrice }) => {
     setValidated(true);
     setIsSubmitting(true);
 
-    const orderItems = cartItems.map(item => ({
+    const orderItems = cartItems.map((item) => ({
       productId: item.id,
-      quantity: item.quantity
+      quantity: item.quantity,
     }));
 
     const data = {
       customerName: name,
       email: email,
-      items: orderItems
+      items: orderItems,
     };
 
     try {
       const response = await axios.post(`${baseUrl}/api/orders/place`, data);
-      console.log(response, 'order placed');
+      console.log(response, "order placed");
 
       // Show success notification
-      setToastVariant('success');
-      setToastMessage('Order placed successfully!');
+      setToastVariant("success");
+      setToastMessage("Order placed successfully!");
       setShowToast(true);
 
       // Clear cart and redirect after a short delay
-      localStorage.removeItem('cart');
+      localStorage.removeItem("cart");
       setTimeout(() => {
-        navigate('/');
+        navigate("/");
       }, 2000);
     } catch (error) {
       console.log(error);
-      setToastVariant('danger');
-      setToastMessage('Failed to place order. Please try again.');
+      setToastVariant("danger");
+      setToastMessage("Failed to place order. Please try again.");
       setShowToast(true);
     } finally {
       setIsSubmitting(false);
     }
   };
-  const convertBase64ToDataURL = (base64String, mimeType = 'image/jpeg') => {
+  const convertBase64ToDataURL = (base64String, mimeType = "image/jpeg") => {
     if (!base64String) return unplugged; // Return fallback image if no data
 
     // If it's already a data URL, return as is
-    if (base64String.startsWith('data:')) {
+    if (base64String.startsWith("data:")) {
       return base64String;
     }
 
     // If it's already a URL, return as is
-    if (base64String.startsWith('http')) {
+    if (base64String.startsWith("http")) {
       return base64String;
     }
 
@@ -93,12 +100,18 @@ const CheckoutPopup = ({ show, handleClose, cartItems, totalPrice }) => {
                     src={convertBase64ToDataURL(item.imageData)}
                     alt={item.name}
                     className="me-3 rounded"
-                    style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      objectFit: "cover",
+                    }}
                   />
                   <div className="flex-grow-1">
                     <h6 className="mb-1">{item.name}</h6>
                     <p className="mb-1 small">Quantity: {item.quantity}</p>
-                    <p className="mb-0 small">Price: ₹{(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="mb-0 small">
+                      Price: ₹{(item.price * item.quantity).toFixed(2)}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -137,23 +150,37 @@ const CheckoutPopup = ({ show, handleClose, cartItems, totalPrice }) => {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleClose} disabled={isSubmitting}>
+            <Button
+              variant="secondary"
+              onClick={handleClose}
+              disabled={isSubmitting}
+            >
               Close
             </Button>
             <Button variant="primary" type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
                   Processing...
                 </>
-              ) : 'Confirm Purchase'}
+              ) : (
+                "Confirm Purchase"
+              )}
             </Button>
           </Modal.Footer>
         </Form>
       </Modal>
 
       {/* Toast notification */}
-      <ToastContainer position="top-end" className="p-3" style={{ zIndex: 1070 }}>
+      <ToastContainer
+        position="top-end"
+        className="p-3"
+        style={{ zIndex: 1070 }}
+      >
         <Toast
           show={showToast}
           onClose={() => setShowToast(false)}
@@ -164,7 +191,9 @@ const CheckoutPopup = ({ show, handleClose, cartItems, totalPrice }) => {
           <Toast.Header closeButton>
             <strong className="me-auto">Order Status</strong>
           </Toast.Header>
-          <Toast.Body className={toastVariant === 'success' ? 'text-white' : ''}>
+          <Toast.Body
+            className={toastVariant === "success" ? "text-white" : ""}
+          >
             {toastMessage}
           </Toast.Body>
         </Toast>
